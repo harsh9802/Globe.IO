@@ -40,3 +40,14 @@ def create_map(country_name, latitude, longitude, country_info, view_type="Hybri
     folium.LayerControl(position="topright", collapsed=False).add_to(country_map)
 
     country_map.save("map.html")
+
+# NEW CLASS: MapView
+class MapView:
+    """Handles map generation and rendering logic for a country."""
+
+    def __init__(self, country_name, latitude, longitude, map_type="Hybrid"):
+        self._country_name = country_name
+        self._latitude = latitude
+        self._longitude = longitude
+        self._map_type = map_type
+
