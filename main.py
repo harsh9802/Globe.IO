@@ -83,3 +83,48 @@ def explore_country():
         conversions = get_currency_conversion(currency_code.group(1))
         if conversions:
             show_currency_conversion_table(currency_code.group(1), conversions)
+            
+    def update_recent_list():
+    """Refreshes the recent search history UI with flags and country names, allowing users to reselect previous searches."""
+    for widget in recent_list_frame.winfo_children():
+        widget.destroy()
+
+    def make_click_handler(entry):
+        return lambda e: (
+            entry_country.delete(0, tk.END),
+            entry_country.insert(0, entry)
+        )
+
+    for country_name in recent_searches:
+        row = tk.Frame(recent_list_frame, bg="#1e293b")
+        row.pack(fill="x", pady=3, padx=4)
+
+        try:
+            response = requests.get(recent_flags[country_name])
+            img_data = Image.open(BytesIO(response.content)).resize((28, 18))
+            flag_img = ImageTk.PhotoImage(img_data)
+            flag_label = tk.Label(row, image=flag_img, bg="#1e293b")
+            flag_label.image = flag_img
+            flag_label.pack(side="left", padx=6)
+        except:
+            flag_label = tk.Label(row, text="🏳️", bg="#1e293b", fg="white")
+            flag_label.pack(side="left", padx=6)
+
+        name_label = tk.Label(row, text=country_name, font=("Segoe UI", 11), fg="white", bg="#1e293b", cursor="hand2")
+        name_label.pack(side="left", padx=6)
+        name_label.bind("<Button-1>", make_click_handler(country_name))
+        row.bind("<Button-1>", make_click_handler(country_name))
+
+def update_flag(url):
+    """Updates and displays the country flag image in the GUI based on the selected country's flag URL."""
+    try:
+        response = requests.get(url)
+        img_data = Image.open(BytesIO(response.content)).resize((40, 25))
+        flag = ImageTk.PhotoImage(img_data)
+        flag_img_label.config(image=flag)
+        flag_img_label.image = flag
+        flag_text_label.configure(text=entry_country.get().title())
+    except:
+        flag_img_label.config(image="")
+        flag_text_label.configure(text=entry_country.get().title())
+
