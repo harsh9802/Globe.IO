@@ -83,7 +83,7 @@ def get_currency_conversion(base_currency):
     conversions = {}
 
     try:
-        # Step 1: base_currency → USD
+        #  base_currency to USD
         url_to_usd = f"http://api.exchangerate.host/convert?access_key={ACCESS_KEY}&from={base_currency}&to=USD&amount=1"
         response_usd = requests.get(url_to_usd)
         data_usd = response_usd.json()
@@ -99,7 +99,7 @@ def get_currency_conversion(base_currency):
         usd_amount = data_usd["result"]
         conversions["USD"] = round(usd_amount, 4)
 
-        # Step 2: USD → GBP, JPY, EUR
+        #  USD to GBP, JPY, EUR
         symbols = ["GBP", "JPY", "EUR"]
         for symbol in symbols:
             url = f"http://api.exchangerate.host/convert?access_key={ACCESS_KEY}&from=USD&to={symbol}&amount={usd_amount}"
