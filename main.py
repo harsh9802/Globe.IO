@@ -84,7 +84,7 @@ def explore_country():
         if conversions:
             show_currency_conversion_table(currency_code.group(1), conversions)
             
-    def update_recent_list():
+def update_recent_list():
     """Refreshes the recent search history UI with flags and country names, allowing users to reselect previous searches."""
     for widget in recent_list_frame.winfo_children():
         widget.destroy()
