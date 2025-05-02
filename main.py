@@ -127,4 +127,15 @@ def update_flag(url):
     except:
         flag_img_label.config(image="")
         flag_text_label.configure(text=entry_country.get().title())
+def save_map():
+    """Opens a file dialog to allow the user to save the currently generated interactive map as an HTML file."""
+    global current_map_view
+    if not current_map_view:
+        messagebox.showinfo("Info", "Please explore a country first.")
+        return
+    filepath = filedialog.asksaveasfilename(defaultextension=".html", filetypes=[("HTML file", "*.html")])
+    if filepath:
+        current_map_view.save_map_as(filepath)
+        messagebox.showinfo("Saved", f"Map saved at:\n{filepath}")
+
 
