@@ -1,6 +1,9 @@
+
+import os
 import requests
 import wikipediaapi
 import pycountry
+from dotenv import load_dotenv
 
 def normalize_country_name(input_name):
     """Convert ISO codes or common abbreviations to official country names using pycountry."""
@@ -55,15 +58,74 @@ def get_country_data(country_input):
         "Currency": f"{currency_name} ({first_currency}) {currency_symbol}",
         "Timezone": timezone,
         "Flag": match.get("flags", {}).get("png", ""),
+        "Fun Fact": get_fun_fact(display_name)
     }
 
     return country_info
 
+def get_fun_fact(country_name):
+    """Fetch a fun fact from Wikipedia with a proper User-Agent."""
+    wiki = wikipediaapi.Wikipedia(
+        language="en",
+        extract_format=wikipediaapi.ExtractFormat.WIKI,
+        user_agent="GlobeExplorer/1.0 (contact@yourdomain.com)"
+    )
+    page = wiki.page(country_name)
+    return page.summary[:300] + "..." if page.exists() else "No fun facts available."
+
+
+def get_currency_conversion(base_currency):
+    """Convert from base_currency to USD, then use USD → [GBP, JPY, EUR] in one call."""
+    # Load the .env file
+    load_dotenv()
+    # Use the variable
+    ACCESS_KEY = os.getenv('API_KEY')
+    conversions = {}
+
+    try:
+        # Step 1: base_currency → USD
+        url_to_usd = f"http://api.exchangerate.host/convert?access_key={ACCESS_KEY}&from={base_currency}&to=USD&amount=1"
+        response_usd = requests.get(url_to_usd)
+        data_usd = response_usd.json()
+
+        if not data_usd.get("success"):
+            print("Failed to convert base currency to USD:", data_usd.get("error", "Unknown error"))
+            return None
+
+        if "result" not in data_usd:
+            print("Unexpected response format - no 'result' field:", data_usd)
+            return None
+
+        usd_amount = data_usd["result"]
+        conversions["USD"] = round(usd_amount, 4)
+
+        # Step 2: USD → GBP, JPY, EUR
+        symbols = ["GBP", "JPY", "EUR"]
+        for symbol in symbols:
+            url = f"http://api.exchangerate.host/convert?access_key={ACCESS_KEY}&from=USD&to={symbol}&amount={usd_amount}"
+            response = requests.get(url)
+            data = response.json()
+
+            if not data.get("success"):
+                print(f"Failed to convert USD to {symbol}:", data.get("error", "Unknown error"))
+                continue  # Skip this currency but continue with others
+
+            if "result" in data:
+                conversions[symbol] = round(data["result"], 4)
+            else:
+                print(f"No result for USD→{symbol} conversion:", data)
+
+        return conversions
+
+    except Exception as e:
+        print(f"Error in get_currency_conversion: {str(e)}")
+        return None
+
 
 class Country:
-    """Represents a country and its metadata, flag, and fun fact."""
 
     def __init__(self, name, capital, region, population, area, currency, timezone, flag_url, fun_fact):
+        """Constructor method for class Country"""
         self.name = name
         self.capital = capital
         self.region = region
@@ -90,4 +152,3 @@ class Country:
             flag_url=info["Flag"],
             fun_fact=info["Fun Fact"]
         )
-
