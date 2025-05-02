@@ -192,4 +192,11 @@ class MapView:
             "Fun Fact": country.fun_fact
         }
         create_map(self._country_name, self._latitude, self._longitude, country_info, self._map_type)
+    def open_in_browser(self):
+        """Opens the most recently generated map (map.html) in the user's default web browser."""
+        webbrowser.open("map.html", new=0)
+
+    def save_map_as(self, new_path):
+        """Saves the generated map HTML file to a new location specified by the user."""
+        shutil.copy("map.html", new_path)
 
