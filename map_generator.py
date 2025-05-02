@@ -53,6 +53,7 @@ def create_map(country_name, latitude, longitude, country_info, view_type="Hybri
       color: #005a9e !important;
     }}
 
+
     html, body {{
       margin: 0;
       padding: 0;
@@ -176,4 +177,25 @@ class MapView:
         self._latitude = latitude
         self._longitude = longitude
         self._map_type = map_type
+    def generate_map(self, country):
+        """Creates a country-specific map using provided country metadata."""
+        country_info = {
+            "Name": country.name,
+            "Capital": country.capital,
+            "Region": country.region,
+            "Population": country.population,
+            "Area": country.area,
+            "Currency": country.currency,
+            "Timezone": country.timezone,
+            "Flag": country.flag_url,
+            "Fun Fact": country.fun_fact
+        }
+        create_map(self._country_name, self._latitude, self._longitude, country_info, self._map_type)
+    def open_in_browser(self):
+        """Opens the most recently generated map (map.html) in the user's default web browser."""
+        webbrowser.open("map.html", new=0)
+
+    def save_map_as(self, new_path):
+        """Saves the generated map HTML file to a new location specified by the user."""
+        shutil.copy("map.html", new_path)
 
