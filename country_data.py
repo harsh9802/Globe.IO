@@ -60,7 +60,18 @@ def get_country_data(country_input):
     }
 
     return country_info
-    
+
+def get_fun_fact(country_name):
+    """Fetch a fun fact from Wikipedia with a proper User-Agent."""
+    wiki = wikipediaapi.Wikipedia(
+        language="en",
+        extract_format=wikipediaapi.ExtractFormat.WIKI,
+        user_agent="GlobeExplorer/1.0 (contact@yourdomain.com)"
+    )
+    page = wiki.page(country_name)
+    return page.summary[:300] + "..." if page.exists() else "No fun facts available."
+
+
 def get_currency_conversion(base_currency):
     """Convert from base_currency to USD, then use USD → [GBP, JPY, EUR] in one call."""
     # Load the .env file
