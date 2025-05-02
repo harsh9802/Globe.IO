@@ -38,7 +38,6 @@ def create_map(country_name, latitude, longitude, country_info, view_type="Hybri
     flag_img_html = f'<div style="text-align:center;"><img src="{flag_url}" alt="Flag" style="width:80px;margin:8px auto;border-radius:4px;"></div>' if flag_url.startswith("http") else ""
     wiki_url = f"https://en.wikipedia.org/wiki/{country_info['Name'].replace(' ', '_')}"
     fun_fact = country_info.get("Fun Fact", "No fun fact available.")
-
     card_html = f'''
     <html>
     <head>
@@ -53,6 +52,7 @@ def create_map(country_name, latitude, longitude, country_info, view_type="Hybri
     .leaflet-popup-close-button:hover {{
       color: #005a9e !important;
     }}
+
 
     html, body {{
       margin: 0;
@@ -156,7 +156,6 @@ def create_map(country_name, latitude, longitude, country_info, view_type="Hybri
     </body>
     </html>
     '''
-
     iframe = IFrame(card_html, width=280, height=390)
     folium.Marker(
         location=[latitude, longitude],
