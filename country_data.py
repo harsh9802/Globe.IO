@@ -1,3 +1,4 @@
+
 import os
 import requests
 import wikipediaapi
@@ -57,6 +58,7 @@ def get_country_data(country_input):
         "Currency": f"{currency_name} ({first_currency}) {currency_symbol}",
         "Timezone": timezone,
         "Flag": match.get("flags", {}).get("png", ""),
+        "Fun Fact": get_fun_fact(display_name)
     }
 
     return country_info
@@ -81,7 +83,7 @@ def get_currency_conversion(base_currency):
     conversions = {}
 
     try:
-        #base_currency to USD
+        # Step 1: base_currency → USD
         url_to_usd = f"http://api.exchangerate.host/convert?access_key={ACCESS_KEY}&from={base_currency}&to=USD&amount=1"
         response_usd = requests.get(url_to_usd)
         data_usd = response_usd.json()
@@ -97,7 +99,7 @@ def get_currency_conversion(base_currency):
         usd_amount = data_usd["result"]
         conversions["USD"] = round(usd_amount, 4)
 
-        # USD to GBP, JPY, EUR
+        # Step 2: USD → GBP, JPY, EUR
         symbols = ["GBP", "JPY", "EUR"]
         for symbol in symbols:
             url = f"http://api.exchangerate.host/convert?access_key={ACCESS_KEY}&from=USD&to={symbol}&amount={usd_amount}"
@@ -121,9 +123,9 @@ def get_currency_conversion(base_currency):
 
 
 class Country:
-    """Represents a country and its metadata, flag, and fun fact."""
 
     def __init__(self, name, capital, region, population, area, currency, timezone, flag_url, fun_fact):
+        """Constructor method for class Country"""
         self.name = name
         self.capital = capital
         self.region = region
@@ -150,4 +152,3 @@ class Country:
             flag_url=info["Flag"],
             fun_fact=info["Fun Fact"]
         )
-
