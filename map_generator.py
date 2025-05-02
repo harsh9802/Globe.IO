@@ -50,4 +50,18 @@ class MapView:
         self._latitude = latitude
         self._longitude = longitude
         self._map_type = map_type
+    def generate_map(self, country):
+        """Creates a country-specific map using provided country metadata."""
+        country_info = {
+            "Name": country.name,
+            "Capital": country.capital,
+            "Region": country.region,
+            "Population": country.population,
+            "Area": country.area,
+            "Currency": country.currency,
+            "Timezone": country.timezone,
+            "Flag": country.flag_url,
+            "Fun Fact": country.fun_fact
+        }
+        create_map(self._country_name, self._latitude, self._longitude, country_info, self._map_type)
 
