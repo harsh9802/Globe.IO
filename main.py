@@ -40,3 +40,46 @@ def show_currency_conversion_table(base_currency, conversions):
         row.pack(fill="x", pady=2)
         ctk.CTkLabel(row, text=currency, width=150, anchor="w", font=("Segoe UI", 11)).pack(side="left", padx=1)
         ctk.CTkLabel(row, text=rate, width=150, anchor="e", font=("Segoe UI", 11)).pack(side="left", padx=1)
+
+def explore_country():
+    """Fetches country data, displays the map, flag, currency info, and updates recent searches in the interface."""
+    global current_map_view
+    card.place_configure(relheight=0.6)
+
+    country_name = entry_country.get().strip()
+    if not country_name:
+        messagebox.showerror("Input Error", "Enter a country name.")
+        return
+    if country_name.lower() == "uk":
+        country_name = "gb"
+    country = Country.fetch_country(country_name)
+    if not country:
+        messagebox.showerror("Not Found", "Country not found.")
+        return
+
+    geolocator = geopy.geocoders.Nominatim(user_agent="geoapi")
+    location = geolocator.geocode(country.name)
+    if not location:
+        messagebox.showerror("Location Error", "Could not locate the country.")
+        return
+
+    map_view = MapView(country.name, location.latitude, location.longitude, map_type=view_var.get())
+    map_view.generate_map(country)
+    map_view.open_in_browser()
+    current_map_view = map_view
+
+    if country.name not in recent_searches:
+        recent_searches.insert(0, country.name)
+        recent_flags[country.name] = country.flag_url
+        if len(recent_searches) > 3:
+            removed = recent_searches.pop()
+            recent_flags.pop(removed, None)
+
+    update_recent_list()
+    update_flag(country.flag_url)
+
+    currency_code = re.search(r"\((.*?)\)", country.currency)
+    if currency_code:
+        conversions = get_currency_conversion(currency_code.group(1))
+        if conversions:
+            show_currency_conversion_table(currency_code.group(1), conversions)
