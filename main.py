@@ -137,5 +137,89 @@ def save_map():
     if filepath:
         current_map_view.save_map_as(filepath)
         messagebox.showinfo("Saved", f"Map saved at:\n{filepath}")
+        
+# UI setup
+root = ctk.CTk()
+root.title("🌍 Globe IO")
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+root.geometry(f"{screen_width}x{screen_height}")
+
+bg_image = Image.open("planet-earth.png")
+bg_photo = ImageTk.PhotoImage(bg_image)
+bg_label = tk.Label(root, image=bg_photo)
+bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+
+card = ctk.CTkFrame(root, fg_color="#0f172a", border_color="#38bdf8", border_width=3)
+card.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.5, relheight=0.6)
+
+title = ctk.CTkLabel(card, text="🌐 Globe IO: Interactive Map Explorer", font=ctk.CTkFont(size=35, weight="bold"))
+title.pack(pady=15)
+
+entry_country = ctk.CTkEntry(card, width=320, font=ctk.CTkFont(size=13), placeholder_text="Enter Country Name")
+entry_country.pack(pady=10)
+entry_country.bind("<Return>", lambda event: explore_country())
+
+recent_label = ctk.CTkLabel(card, text="🔘 Recent Searches", font=("Segoe UI",15, "bold"), text_color="white")
+recent_label.pack()
+
+# Scrollable recent search frame (narrow)
+recent_container = ctk.CTkFrame(card, fg_color="#0f172a")
+recent_container.pack(pady=2)
+
+recent_list_outer = tk.Frame(recent_container, bg="#1e293b", height=90, width=250)
+recent_list_outer.pack()
+
+recent_canvas = tk.Canvas(recent_list_outer, height=90, width=250, bg="#1e293b", highlightthickness=0)
+scrollbar = tk.Scrollbar(recent_list_outer, orient="vertical", command=recent_canvas.yview)
+recent_canvas.configure(yscrollcommand=scrollbar.set)
+
+scrollbar.pack(side="right", fill="y")
+recent_canvas.pack(side="left", fill="both", expand=True)
+
+recent_list_frame = tk.Frame(recent_canvas, bg="#1e293b", width=250)
+recent_canvas.create_window((0, 0), window=recent_list_frame, anchor="nw")
+
+def on_frame_configure(event):
+    """Automatically resizes the scrollable area of the recent search list when its content changes."""
+    recent_canvas.configure(scrollregion=recent_canvas.bbox("all"))
+
+recent_list_frame.bind("<Configure>", on_frame_configure)
+
+flag_frame = ctk.CTkFrame(card, fg_color="#0f172a")
+flag_frame.pack(pady=4)
+flag_img_label = tk.Label(flag_frame, bg="#0f172a")
+flag_img_label.pack(side="left", padx=4)
+flag_text_label = ctk.CTkLabel(flag_frame, text="", font=ctk.CTkFont(size=13, weight="bold"))
+flag_text_label.pack(side="left", padx=4)
+
+mapview_label = ctk.CTkLabel(card, text="🗺️Choose Your Map View Style:", font=("Segoe UI",15, "bold"), text_color="white")
+mapview_label.pack(pady=(2, 0))
+
+view_var = ctk.StringVar(value="Hybrid")
+view_menu = ctk.CTkOptionMenu(master=card,
+                              values=["Default", "Roadmap", "Satellite", "Hybrid"],
+                              variable=view_var,
+                              width=220,
+                              fg_color="#1e293b",
+                              button_color="#0ea5e9",
+                              button_hover_color="#38bdf8",
+                              text_color="white")
+view_menu.pack(pady=6)
+
+btn_frame = ctk.CTkFrame(card, fg_color="#0f172a")
+btn_frame.pack(pady=10)
+
+explore_btn = ctk.CTkButton(btn_frame, text="🌍Explore with Globe IO", command=explore_country, width=180, height=40, font=ctk.CTkFont(size=13, weight="bold"))
+explore_btn.pack(side="left", padx=6)
+
+save_btn = ctk.CTkButton(btn_frame, text="💾Save Map", command=save_map, width=150, height=40, font=ctk.CTkFont(size=13, weight="bold"))
+save_btn.pack(side="left", padx=6)
+
+currency_frame = ctk.CTkFrame(card, fg_color="#0f172a")
+currency_frame.pack(pady=5, fill="both", expand=False)
+
+root.mainloop()
+
 
 
